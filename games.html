@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLEX SITE | Oyun</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">FLEX<span>.</span></div>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Ana səhifə</a></li>
+                <li><a href="about.html">Haqqımızda</a></li>
+                <li><a href="game.html" class="active">Oyun</a></li>
+            </ul>
+
+            <a href="#game" class="nav-btn">PLAY NOW →</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="game-hero">
+            <p class="small-title">🎮 FLEX GAME</p>
+            <h1>REACTION<br><span>MASTER.</span></h1>
+            <p>
+                Ekrana kliklə, xal topla və öz rekordunu qır!
+            </p>
+        </section>
+
+        <section class="game-container" id="game">
+
+            <div class="score-board">
+                <div>
+                    <span>SCORE</span>
+                    <strong id="score">0</strong>
+                </div>
+
+                <div>
+                    <span>TIME</span>
+                    <strong id="time">30</strong>
+                </div>
+
+                <div>
+                    <span>BEST</span>
+                    <strong id="best">0</strong>
+                </div>
+            </div>
+
+            <div class="game-box" id="gameBox">
+                <div class="game-message" id="message">
+                    <div class="big-game-icon">⚡</div>
+                    <h2>HAZIRSAN?</h2>
+                    <p>Start düyməsinə bas və dairəni tut!</p>
+                    <button onclick="startGame()">START GAME</button>
+                </div>
+
+                <button class="target" id="target"></button>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <div class="logo">FLEX<span>.</span></div>
+        <p>© 2026 FLEX SITE. Bütün hüquqlar qorunur.</p>
+    </footer>
+
+    <script>
+        let score = 0;
+        let time = 30;
+        let gameRunning = false;
+        let timer;
+
+        const scoreEl = document.getElementById("score");
+        const timeEl = document.getElementById("time");
+        const bestEl = document.getElementById("best");
+        const target = document.getElementById("target");
+        const message = document.getElementById("message");
+        const gameBox = document.getElementById("gameBox");
+
+        let best = localStorage.getItem("flexBest") || 0;
+        bestEl.textContent = best;
+
+        function startGame() {
+            score = 0;
+            time = 30;
+            gameRunning = true;
+
+            scoreEl.textContent = score;
+            timeEl.textContent = time;
+
+            message.style.display = "none";
+            target.style.display = "block";
+
+            moveTarget();
+
+            clearInterval(timer);
+
+            timer = setInterval(() => {
+                time--;
+                timeEl.textContent = time;
+
+                if (time <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function moveTarget() {
+            const boxWidth = gameBox.clientWidth;
+            const boxHeight = gameBox.clientHeight;
+
+            const maxX = boxWidth - 65;
+            const maxY = boxHeight - 65;
+
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+
+            target.style.left = x + "px";
+            target.style.top = y + "px";
+        }
+
+        target.addEventListener("click", () => {
+            if (!gameRunning) return;
+
+            score++;
+            scoreEl.textContent = score;
+
+            moveTarget();
+        });
+
+        function endGame() {
+            gameRunning = false;
+            clearInterval(timer);
+
+            target.style.display = "none";
+            message.style.display = "flex";
+
+            let text = "";
+
+            if (score > best) {
+                best = score;
+                localStorage.setItem("flexBest", best);
+                bestEl.textContent = best;
+                text = "🔥 YENİ REKORD!";
+            } else {
+                text = "OYUN BİTDİ!";
+            }
+
+            message.innerHTML = `
+                <div class="big-game-icon">🏆</div>
+                <h2>${text}</h2>
+                <p>Sənin nəticən: <strong>${score}</strong></p>
+                <button onclick="startGame()">YENİDƏN OYNA</button>
+            `;
+        }
+    </script>
+
+</body>
+</html>
